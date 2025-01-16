@@ -16,6 +16,9 @@ const BreakingNews = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString()
+  );
 
   const defaultImage = "/placeholder.svg?height=400&width=600";
 
@@ -27,6 +30,13 @@ const BreakingNews = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center py-12 px-4">
@@ -105,50 +115,46 @@ const BreakingNews = () => {
         </motion.div>
 
         {/* Breaking News Preview */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="w-full md:w-1/2"
-        >
-          <Card className="bg-black border-gray-700 overflow-hidden">
-            <div className="relative">
-              <img
-                src={image || defaultImage}
-                alt="Breaking News"
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute top-4 left-4 flex items-center space-x-2">
-                <span className="bg-red-600 text-white font-bold px-3 py-1 rounded-full text-sm animate-pulse">
-                  LIVE
-                </span>
-                <span className="bg-gray-800 text-white opacity-75 px-2 py-1 rounded-full text-xs flex items-center">
-                  <Camera className="w-3 h-3 mr-1" /> ON AIR
-                </span>
+        <div className="mt-10 w-full max-w-4xl bg-black shadow-lg overflow-hidden relative">
+          <div className="relative aspect-video">
+            {/* Image */}
+            <img
+              src={image || defaultImage}
+              alt="Breaking News"
+              className="w-full h-full object-cover"
+            />
+            {/* Website Watermark */}
+            <span className="absolute top-4 right-4 text-gray-300 opacity-70 text-sm">
+              breakyourownnews.com
+            </span>
+            {/* Live Badge */}
+            <div className="absolute top-4 left-4">
+              <span className="bg-red-600 text-white font-bold px-6 py-2 text-xl inline-block">
+                LIVE
+              </span>
+            </div>
+            {/* Breaking News Banner */}
+            <div className="absolute bottom-0 left-0 w-full mt-30px">
+              <div className="bg-gradient-to-r from-red-600 to-red-700 text-white text-2xl font-bold px-4 py-2">
+                BREAKING NEWS
+              </div>
+              <div className="bg-white text-black py-4 px-4">
+                <h2 className="text-4xl font-black">
+                  {headline || "HEADLINE GOES HERE"}
+                </h2>
+              </div>
+              {/* Lower Third */}
+              <div className="flex">
+                <div className="bg-black text-white px-4 py-2 text-xl">
+                  {currentTime.split(":").slice(0, 2).join(":")}
+                </div>
+                <div className="bg-yellow-400 text-black font-bold text-xl px-4 py-2 flex-1">
+                  {description || "Breaking news description here"}
+                </div>
               </div>
             </div>
-            <CardContent className="p-6">
-              <div className="bg-gradient-to-r from-red-600 to-red-500 text-white text-xl font-bold px-4 py-2 rounded-t-lg inline-block">
-                Breaking News
-              </div>
-              <h2 className="text-3xl font-extrabold text-white mt-4 leading-tight">
-                {headline || "Headline Goes Here"}
-              </h2>
-              <p className="text-lg text-gray-300 mt-4 leading-relaxed">
-                {description ||
-                  "Description goes here. Add some text to make it look realistic!"}
-              </p>
-            </CardContent>
-            <CardFooter className="bg-yellow-400 text-black font-bold text-sm px-4 py-2 flex justify-between items-center">
-              <span>
-                {new Date().toLocaleTimeString()} - This is breaking news
-              </span>
-              <span className="flex items-center">
-                <AlertTriangle className="w-4 h-4 mr-1" /> Developing Story
-              </span>
-            </CardFooter>
-          </Card>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );
