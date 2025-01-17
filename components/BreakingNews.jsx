@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Upload, Camera, AlertTriangle } from "lucide-react";
+import { Upload, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import * as htmlToImage from "html-to-image";
 
 const BreakingNews = () => {
   const [headline, setHeadline] = useState("");
@@ -17,10 +18,11 @@ const BreakingNews = () => {
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(
-    new Date().toLocaleTimeString()
+    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   );
 
-  const defaultImage = "/placeholder.svg?height=400&width=600";
+  const previewRef = useRef(null); // Ref for the preview container
+  const defaultImage = "https://placehold.co/600x400";
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -33,10 +35,25 @@ const BreakingNews = () => {
 
   React.useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString());
-    }, 1000);
+      setCurrentTime(
+        new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+    }, 60000); // Update every minute
     return () => clearInterval(intervalId);
   }, []);
+
+  const handleDownload = async () => {
+    if (previewRef.current) {
+      const dataUrl = await htmlToImage.toPng(previewRef.current);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "breaking-news.png";
+      link.click();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center py-12 px-4">
@@ -107,52 +124,51 @@ const BreakingNews = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full bg-gradient-to-r from-red-500 to-yellow-500 text-white font-bold py-2 rounded-lg hover:from-red-600 hover:to-yellow-600 transition-all duration-300">
-                Generate Breaking News
+              <Button
+                onClick={handleDownload}
+                className="w-full bg-gradient-to-r from-red-500 to-yellow-500 text-white font-bold py-2 rounded-lg hover:from-red-600 hover:to-yellow-600 transition-all duration-300"
+              >
+                Download Image
               </Button>
             </CardFooter>
           </Card>
         </motion.div>
 
         {/* Breaking News Preview */}
-        <div className="mt-10 w-full max-w-4xl bg-black shadow-lg overflow-hidden relative">
-          <div className="relative aspect-video">
+        <div
+          ref={previewRef}
+          className="mt-10 w-full max-w-3xl bg-black shadow-lg rounded-lg overflow-hidden"
+        >
+          <div className="relative">
             {/* Image */}
             <img
               src={image || defaultImage}
               alt="Breaking News"
-              className="w-full h-full object-cover"
+              className="w-full h-64 object-cover"
             />
-            {/* Website Watermark */}
-            <span className="absolute top-4 right-4 text-gray-300 opacity-70 text-sm">
-              breakyourownnews.com
-            </span>
+            {/* Gradient Overlay */}
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-transparent to-transparent"></div>
             {/* Live Badge */}
-            <div className="absolute top-4 left-4">
-              <span className="bg-red-600 text-white font-bold px-6 py-2 text-xl inline-block">
-                LIVE
-              </span>
+            <span className="absolute top-4 left-4 bg-red-600 text-white font-bold px-4 py-2 rounded-lg text-sm">
+              LIVE
+            </span>
+          </div>
+          {/* Headline and Description */}
+          <div className="p-6">
+            <div className="bg-red-600 text-white text-xl font-bold px-4 py-2">
+              Breaking News
             </div>
-            {/* Breaking News Banner */}
-            <div className="absolute bottom-0 left-0 w-full mt-30px">
-              <div className="bg-gradient-to-r from-red-600 to-red-700 text-white text-2xl font-bold px-4 py-2">
-                BREAKING NEWS
-              </div>
-              <div className="bg-white text-black py-4 px-4">
-                <h2 className="text-4xl font-black">
-                  {headline || "HEADLINE GOES HERE"}
-                </h2>
-              </div>
-              {/* Lower Third */}
-              <div className="flex">
-                <div className="bg-black text-white px-4 py-2 text-xl">
-                  {currentTime.split(":").slice(0, 2).join(":")}
-                </div>
-                <div className="bg-yellow-400 text-black font-bold text-xl px-4 py-2 flex-1">
-                  {description || "Breaking news description here"}
-                </div>
-              </div>
-            </div>
+            <h2 className="text-3xl font-extrabold text-white mt-4">
+              {headline || "Headline Goes Here"}
+            </h2>
+            <p className="text-lg text-gray-300 mt-2">
+              {description ||
+                "Description goes here. Add some text to make it look realistic!"}
+            </p>
+          </div>
+          {/* Footer (Time or Additional Info) */}
+          <div className="bg-yellow-400 text-black font-bold text-sm px-4 py-2">
+            {currentTime || "Loading..."}
           </div>
         </div>
       </div>
