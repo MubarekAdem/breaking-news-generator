@@ -17,31 +17,9 @@ const Navbar = () => {
       {/* Your Navbar content */}
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo or brand */}
-        <div className="text-2xl font-extrabold text-gradient bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-          MyApp
-        </div>
 
         {/* Navbar Links */}
-        <div className="hidden md:flex space-x-8">
-          <Link
-            href="/"
-            className="text-white hover:text-gray-400 transition duration-300"
-          >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="text-white hover:text-gray-400 transition duration-300"
-          >
-            About
-          </Link>
-          <Link
-            href="/contact"
-            className="text-white hover:text-gray-400 transition duration-300"
-          >
-            Contact
-          </Link>
-        </div>
+        <div className="hidden md:flex space-x-8"></div>
 
         {/* GitHub Button */}
         <div className="flex items-center space-x-4">
