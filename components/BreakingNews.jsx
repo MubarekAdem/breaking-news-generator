@@ -46,13 +46,16 @@ const BreakingNews = () => {
   }, []);
 
   const handleDownload = async () => {
-    if (previewRef.current) {
-      const dataUrl = await htmlToImage.toPng(previewRef.current);
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "breaking-news.png";
-      link.click();
-    }
+    // Wait for a short period to allow for the currentTime update
+    setTimeout(async () => {
+      if (previewRef.current) {
+        const dataUrl = await htmlToImage.toPng(previewRef.current);
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "breaking-news.png";
+        link.click();
+      }
+    }, 100); // Adding a small delay to ensure the currentTime state is updated
   };
 
   return (
@@ -161,16 +164,17 @@ const BreakingNews = () => {
             <h2 className="text-3xl font-extrabold text-white mt-4">
               {headline || "Headline Goes Here"}
             </h2>
-            <p className="text-lg text-gray-300 mt-2">
-              {description ||
-                "Description goes here. Add some text to make it look realistic!"}
-            </p>
-          </div>
-          {/* Footer (Time or Additional Info) */}
-          <div className="bg-yellow-400 text-black font-bold text-sm px-4 py-2">
-            {currentTime || "Loading..."}
+
+            <div className="bg-yellow-400 text-black font-bold text-sm px-4 py-2">
+              {currentTime || "Loading..."}
+              <p className="text-lg text-black mt-2">
+                {description ||
+                  "Description goes here. Add some text to make it look realistic!"}
+              </p>
+            </div>
           </div>
         </div>
+        {/* Footer (Time or Additional Info) */}
       </div>
     </div>
   );
